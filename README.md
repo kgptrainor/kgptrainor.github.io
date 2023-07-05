@@ -1,1 +1,0 @@
-# kgptrainor.github.io
