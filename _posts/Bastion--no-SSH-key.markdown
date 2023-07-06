@@ -6,7 +6,6 @@ date:   2023-07-03 22:06:00 +0100
 categories: jekyll update
 ---
 
-<!--more-->
 
 # Bastion hosts in Private VPC over SSM no SSH key
 
