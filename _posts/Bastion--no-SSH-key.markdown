@@ -1,9 +1,9 @@
+
 ---
-title: "Bastion hosts in Private VPC over SSM no SSH key"
-date: 2022-05-04T15:07:09+01:00
-archives: "2022"
-tags: ["AWS"]
-author: Kieran Trainor
+layout: post
+title:  "Bastion hosts in Private VPC over SSM no SSH key"
+date:   2023-07-03 22:06:00 +0100
+categories: jekyll update
 ---
 
 <!--more-->
