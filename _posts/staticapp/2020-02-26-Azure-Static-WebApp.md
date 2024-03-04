@@ -15,9 +15,9 @@ categories: Azure
 - GitHub Actions Configured to push updates to the static Site.
 - EasyAuth (Azure App Registration) - will provide Authenitaion.
 
+
 &nbsp;
-![](./images/azure-static-web-apps-overview.png)
-&nbsp;
+![Crepe](/images/azure-static-web-apps-overview.png)
 
 Example Repo :   
 https://github.com/kgptrainor/html-simple-site  
