@@ -17,7 +17,8 @@ categories: Azure
 
 
 &nbsp;
-![Crepe](/images/azure-static-web-apps-overview.png)
+
+![Crepe]({{ '/images/azure-static-web-apps-overview.png' | relative_url }})
 
 Example Repo :   
 https://github.com/kgptrainor/html-simple-site  
