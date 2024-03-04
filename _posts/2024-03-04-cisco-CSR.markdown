@@ -2,7 +2,7 @@
 layout: post
 title:  "K8S - Commands"
 date:   2024-03-04 12:13:26 +0000
-categories: AWS EKS
+tags: [books, test]
 ---
 
 ## Background 
