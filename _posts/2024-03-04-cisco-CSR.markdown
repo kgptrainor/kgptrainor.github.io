@@ -32,10 +32,8 @@ The separation of `contour` (ClusterIP) and `envoy` (LoadBalancer) services is a
 ``
 kubectl get namespaces
 kubectl get all --namespace projectcontour
-
 kubectl logs -n projectcontour -c envoy envoy-gwjlh
 kubectl describe pod envoy-gwjlh -n projectcontour
-
 decribe the service 
 kubectl get svc envoy -n projectcontour -o yaml
 ``
