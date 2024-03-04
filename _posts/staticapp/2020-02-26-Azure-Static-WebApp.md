@@ -26,7 +26,7 @@ https://github.com/kgptrainor/html-simple-site
 (Note : All secrets and referecnce to Static App URLs no longer exist - resources have been deleted)
 
 ## Terraform deployment  
-
+![Crepe](/assets/img/azure-static-web-apps-overview.png)
 Resources deployed :
 - Azure recource group 
 - Azure App Registration 
