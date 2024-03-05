@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  "K8S - Commands"
+title:  "K8S - Contour Ingress Controller"
 date:   2024-03-04 12:13:26 +0000
-tags: [books, test]
+tags: [K8S]
 ---
 
 ## Background 
@@ -30,26 +30,27 @@ The separation of `contour` (ClusterIP) and `envoy` (LoadBalancer) services is a
 
 ## Basic Comamnds
 
-```bash
+```
 kubectl get namespaces
 kubectl get all --namespace projectcontour
 kubectl logs -n projectcontour -c envoy envoy-gwjlh
 kubectl describe pod envoy-gwjlh -n projectcontour
 kubectl describe svc envoy -n projectcontour
 kubectl get svc envoy -n projectcontour -o yaml
+```
 
 ## Contour ingress Controller install
 
 This is te only way i managed to install the ingress controller with an external facing Loadbalancer
 
-``
+```
 kubectl apply -f https://projectcontour.io/quickstart/contour.yaml -n projectcontour
 kubectl annotate svc envoy -n projectcontour --overwrite service.beta.kubernetes.io/aws-load-balancer-internal=false
-``
+```
 
-``
+
 Deploy a test ingress application 
-
+```
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -109,7 +110,7 @@ spec:
             name: nginx-service
             port:
               number: 80
-``
+```
 
 kubectl apply -f nginx-ingress.yaml
 
@@ -117,6 +118,7 @@ kubectl apply -f nginx-ingress.yaml
 
 ## Error
 
+```
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install kubeapps --namespace kubeapps bitnami/kubeapps \
     --set global.imageRegistry=217273820646.dkr.ecr.us-east-1.amazonaws.com/7762bbba-0563-4863-bb12-2b1dfb26d3c6/cg-1813167126 \
@@ -134,3 +136,4 @@ helm install kubeapps --namespace kubeapps bitnami/kubeapps \
     --set frontend.image.tag=1.0.0-0-latest \
     --set postgresql.image.repository=postgresql \
     --set postgresql.image.tag=1.0.0-0-latest
+```
