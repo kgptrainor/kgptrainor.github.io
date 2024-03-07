@@ -331,7 +331,10 @@ If you’re running multiple ingress controllers, or running on a cloudprovider 
 
 ## References
 
+## References
+
 - [Contour Getting Started](https://projectcontour.io/getting-started/#option-2-helm)
 - [Contour Deployment Options](https://projectcontour.io/docs/v1.0.1/deploy-options/)
 - [Deploying Contour with AWS NLB](https://projectcontour.io/guides/deploy-aws-nlb/)
 - [Testing Your Contour Installation](https://projectcontour.io/docs/1.28/deploy-options/#testing-your-installation)
+- [How to Expose Multiple Applications on Amazon EKS using a Single Application Load Balancer](https://aws.amazon.com/blogs/containers/how-to-expose-multiple-applications-on-amazon-eks-using-a-single-application-load-balancer/)
