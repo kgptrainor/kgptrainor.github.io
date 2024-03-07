@@ -9,32 +9,6 @@ tags: [K8S]
 
 Contour is an open source Kubernetes ingress controller that works by deploying the Envoy proxy as a reverse proxy and load balancer.
 
-## Install on Amazon EKS
-
-```
-helm upgrade contour-ingress bitnami/contour   --namespace projectcontour  -f valuescon.yaml
-```
-
-Values.yaml file :
-
-I had to switch off HostPort as it was causing conflocts. 
-
-```
-envoy:
-  useHostPort: false
-  service:
-    annotations:
-      service.beta.kubernetes.io/aws-load-balancer-internal: "false"
-      service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
-      service.beta.kubernetes.io/aws-load-balancer-type: "external"
-```
-
-Check your deployment :
-
-```
-kubectl get all --namespace projectcontour
-```
-
 ## Contour Service (ClusterIP):
 
 - **Type:** ClusterIP
@@ -54,67 +28,76 @@ kubectl get all --namespace projectcontour
 The separation of `contour` (ClusterIP) and `envoy` (LoadBalancer) services is a common architecture in Ingress controllers like Contour. The `contour` service is used for administrative purposes, while the `envoy` service serves as the entry point for incoming traffic, routing it to the appropriate backend services based on the Ingress rules.
 
 
-## Test your ingress
-
-Simple test application :
+## Basic Comamnds
 
 ```
-kubectl apply -f https://projectcontour.io/examples/kuard.yaml
+kubectl get namespaces
+kubectl get all --namespace projectcontour
+kubectl logs -n projectcontour -c envoy envoy-gwjlh
+kubectl describe pod envoy-gwjlh -n projectcontour
+kubectl describe svc envoy -n projectcontour
+kubectl get svc envoy -n projectcontour -o yaml
 ```
 
-Get Loadblancer dns name and test your application
+## Contour ingress Controller install
+
+I had to switch off hostport and it was causing conflocts 
+
+helm install contour-ingress bitnami/contour \
+  --namespace projectcontour \
+  --create-namespace \
+  --set service.type=LoadBalancer \
+  --set service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-internal"="false" \
+  --set service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-scheme"="internet-facing" \
+  --set service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-type"="external" \
+  --set envoy.useHostPort=false
+
+
+  helm upgrade contour-ingress bitnami/contour \
+  --namespace projectcontour \
+  --set service.type=LoadBalancer \
+  --set service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-internal"=false \
+  --set service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-scheme"="internet-facing" \
+  --set service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-type"="external" \
+  --set envoy.useHostPort=false
+
+
+
+helm install contour-ingress bitnami/contour --namespace projectcontour --create-namespace --set service.type=LoadBalancer --set service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-internal"=false --set service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-scheme"="internet-facing" --set awsLoadBalancer.subnets[0]=subnet-050e58abe7dda67d4 --set awsLoadBalancer.subnets[1]=subnet-0cc832eeb9b1a4474 --set envoy.useHostPort=false
+
+
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm install contour-ingress --set envoy.useHostPort=false --set contour.envoy.service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-internal"=false bitnami/contour --namespace projectcontour --create-namespace 
+
+
+helm install my-release bitnami/contour   --namespace projectcontour   --create-namespace   --set service.type=LoadBalancer   --set service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-internal"=false   --set service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-scheme"="internet-facing"   --set awsLoadBalancer.subnets[0]=subnet-050e58abe7dda67d4   --set awsLoadBalancer.subnets[1]=subnet-0cc832eeb9b1a4474
+
+
+This is te only way i managed to install the ingress controller with an external facing Loadbalancer
 
 ```
-kubectl get po,svc,ing -l app=kuard
+kubectl apply -f https://projectcontour.io/quickstart/contour.yaml -n projectcontour
+kubectl annotate svc envoy -n projectcontour --overwrite service.beta.kubernetes.io/aws-load-balancer-internal=false
 ```
 
-Remove when tested
-```
-kubectl delete -f https://projectcontour.io/examples/kuard.yaml
-```
-
-## Configure your ingress for your Microservice 
-
-Create your ingress file app-ingress.yaml
-kubectl apply -f test-ingress.yaml -n color-app
 
 ```
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: app-ingress
-  labels:
-    app: shared-app
-spec:
-  rules:
-    - host: k8s-projectc-contouri-957094c67c-936aee38a4c347de.elb.ap-east-1.amazonaws.com
-      http:
-        paths:
-          - path: /yellow
-            pathType: Prefix
-            backend:
-              service:
-                name: yellow-service
-                port:
-                  number: 80
-          - path: /green
-            pathType: Prefix
-            backend:
-              service:
-                name: green-service
-                port:
-                  number: 80
-          # Add more paths for other apps
+kubectl apply -f local-contour1.yaml -n projectcontour
+kubectl annotate svc envoy -n projectcontour --overwrite service.beta.kubernetes.io/aws-load-balancer-internal=false
 ```
 
 
 ## Toubleshooting 
 
-Usefull commands : 
+Check the status of services and pods 
+
+You may bet teh follwoing error :
+
+4m56s       Warning   FailedScheduling   pod/my-release-contour-envoy-v485g   0/3 nodes are available: 1 node(s) didn't have free ports for the requested pod ports. preemption: 0/3 nodes are available: 3 No preemption victims found for incoming pod.
+
 
 ```
 kubectl -n projectcontour get po,svc
-kubectl get all --namespace projectcontour
 kubectl logs my-release-contour-envoy-lc4l7 -n projectcontour  # replace the pod name 
 kubectl -n projectcontour logs contour-ingress-envoy-d8mbr -c envoy
 kubectl -n projectcontour describe pod my-release-contour-envoy-lc4l7
@@ -128,6 +111,9 @@ kubectl get ingress --all-namespaces
 kubectl delete pod my-pod -n my-namespace
 
 ```
+
+  --set envoy.readinessProbe.successThreshold=5 
+## Deploy a test ingress application
 
 # Running Contour in tandem with another ingress controller
 If you’re running multiple ingress controllers, or running on a cloudprovider that natively handles ingress, you can specify the annotation kubernetes.io/ingress.class: "contour" on all ingresses that you would like Contour to claim. You can customize the class name with the --ingress-class-name flag at runtime. If the kubernetes.io/ingress.class annotation is present with a value other than "contour", Contour will ignore that ingress.
@@ -202,5 +188,3 @@ kubectl apply -f nginx-ingress.yaml
 
 https://projectcontour.io/getting-started/#option-2-helm
 https://projectcontour.io/docs/v1.0.1/deploy-options/
-https://projectcontour.io/guides/deploy-aws-nlb/
-https://projectcontour.io/docs/1.28/deploy-options/#testing-your-installation
