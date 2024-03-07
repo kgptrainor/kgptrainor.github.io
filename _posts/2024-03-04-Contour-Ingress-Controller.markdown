@@ -73,6 +73,202 @@ Remove when tested
 kubectl delete -f https://projectcontour.io/examples/kuard.yaml
 ```
 
+# Example app to test the ingress
+
+Modified example based on teh follwoing blog , we use the yellow and green service to test our rules: 
+https://aws.amazon.com/blogs/containers/how-to-expose-multiple-applications-on-amazon-eks-using-a-single-application-load-balancer/
+
+## 1. Application and Docker Image Creation Process
+
+### Create Directories
+```bash
+mkdir green/ yellow/
+```
+### Copy Application Code
+Green Application
+```
+echo '<html style="background-color: green;"></html>' > green/index.html
+```
+Yellow Application
+```
+echo '<html style="background-color: yellow;"></html>' > yellow/index.html
+```
+### Dockerfile Creation
+
+Green Application Dockerfile
+```
+FROM public.ecr.aws/nginx/nginx:1.20-alpine
+RUN mkdir -p /usr/share/nginx/html/green
+COPY ./index.html /usr/share/nginx/html/green/index.html 
+EXPOSE 80
+```
+Yellow Application Dockerfile
+```
+FROM nginx:alpine
+RUN mkdir -p /usr/share/nginx/html/yellow
+COPY ./index.html /usr/share/nginx/html/yellow/index.html 
+EXPOSE 80
+```
+### Amazon ECR Repository Creation
+```
+aws ecr create-repository --repository-name green
+aws ecr create-repository --repository-name yellow
+```
+### Push to ECR
+
+```
+export AWS_REGION=$(aws ec2 describe-availability-zones --output text --query 'AvailabilityZones[0].[RegionName]')
+export AWS_REGISTRY_ID=$(aws ecr describe-registry --query registryId --output text)
+export AWS_ECR_REPO=${AWS_REGISTRY_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+
+aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ECR_REPO
+
+cd yellow/
+docker build . -t yellow
+docker tag yellow:latest $AWS_ECR_REPO/yellow:latest
+docker push $AWS_ECR_REPO/yellow:latest
+cd ..
+
+cd green/
+docker build . -t green
+docker tag green:latest $AWS_ECR_REPO/green:latest
+docker push $AWS_ECR_REPO/green:latest
+cd ..
+```
+### Deploy your application to K8S Cluster 
+
+**kubectl apply -f app-deployment.yaml**
+
+```
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: color-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: green-app
+  namespace: color-app
+  labels:
+    app: green-app
+spec:
+  selector:
+    matchLabels:
+      app: green-app
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: green-app
+    spec:
+      containers:
+      - name: green-container
+        image: 788148918336.dkr.ecr.ap-east-1.amazonaws.com/green:latest
+        ports:
+          - containerPort: 80
+        resources:
+          limits:
+            memory: "100Mi"
+            cpu: "200m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yellow-app
+  namespace: color-app
+  labels:
+    app: yellow-app
+spec:
+  selector:
+    matchLabels:
+      app: yellow-app
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: yellow-app
+    spec:
+      containers:
+      - name: yellow-container
+        image: 788148918336.dkr.ecr.ap-east-1.amazonaws.com/yellow:latest
+        ports:
+          - containerPort: 80
+        resources:
+          limits:
+            memory: "100Mi"
+            cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: color-app
+  name: green-service
+  labels:
+    app: green-app
+spec:
+  type: NodePort
+  selector:
+    app: green-app
+  ports:
+    - port: 80
+      targetPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: color-app
+  name: yellow-service
+  labels:
+    app: yellow-app
+spec:
+  type: NodePort
+  selector:
+    app: yellow-app
+  ports:
+    - port: 80
+      targetPort: 80
+```
+
+### Create your Ingress 
+
+**kubectl apply -f nginx-ingress.yaml**
+
+```
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: color-app
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+  labels:
+    app: shared-app
+spec:
+  rules:
+    - host: k8s-projectc-contouri-957094c67c-936aee38a4c347de.elb.ap-east-1.amazonaws.com
+      http:
+        paths:
+          - path: /yellow
+            pathType: Prefix
+            backend:
+              service:
+                name: yellow-service
+                port:
+                  number: 80
+          - path: /green
+            pathType: Prefix
+            backend:
+              service:
+                name: green-service
+                port:
+                  number: 80
+```
+
+
+
 ## Configure your ingress for your Microservice 
 
 Create your ingress file app-ingress.yaml
@@ -132,75 +328,10 @@ kubectl delete pod my-pod -n my-namespace
 # Running Contour in tandem with another ingress controller
 If you’re running multiple ingress controllers, or running on a cloudprovider that natively handles ingress, you can specify the annotation kubernetes.io/ingress.class: "contour" on all ingresses that you would like Contour to claim. You can customize the class name with the --ingress-class-name flag at runtime. If the kubernetes.io/ingress.class annotation is present with a value other than "contour", Contour will ignore that ingress.
 
-# Example app to test the ingress
-```
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-deployment
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:latest
-        ports:
-        - containerPort: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: nginx-service
-spec:
-  selector:
-    app: nginx
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-  type: ClusterIP
-``
 
-kubectl apply -f nginx-deployment.yaml
+## References
 
-
-## Ingress 
-
-``
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: nginx-ingress
-  namespace: projectcontour
-  annotations:
-    kubernetes.io/ingress.class: "contour"
-spec:
-  rules:
-  - host: nginx.example.com  # Update with your desired host
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: nginx-service
-            port:
-              number: 80
-```
-
-kubectl apply -f nginx-ingress.yaml
-
-
-## References 
-
-https://projectcontour.io/getting-started/#option-2-helm
-https://projectcontour.io/docs/v1.0.1/deploy-options/
-https://projectcontour.io/guides/deploy-aws-nlb/
-https://projectcontour.io/docs/1.28/deploy-options/#testing-your-installation
+- [Contour Getting Started](https://projectcontour.io/getting-started/#option-2-helm)
+- [Contour Deployment Options](https://projectcontour.io/docs/v1.0.1/deploy-options/)
+- [Deploying Contour with AWS NLB](https://projectcontour.io/guides/deploy-aws-nlb/)
+- [Testing Your Contour Installation](https://projectcontour.io/docs/1.28/deploy-options/#testing-your-installation)
