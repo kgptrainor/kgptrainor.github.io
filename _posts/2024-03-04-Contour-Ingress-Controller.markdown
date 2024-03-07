@@ -12,7 +12,7 @@ Contour is an open source Kubernetes ingress controller that works by deploying 
 ## Install on Amazon EKS
 
 ```
-helm upgrade contour-ingress bitnami/contour   --namespace projectcontour  -f valuescon.yaml
+helm upgrade contour-ingress bitnami/contour   --namespace projectcontour  -f values.yaml
 ```
 
 Values.yaml file :
