@@ -75,7 +75,7 @@ kubectl delete -f https://projectcontour.io/examples/kuard.yaml
 
 # Example app to test the ingress
 
-Modified example based on teh follwoing blog , we use the yellow and green service to test our rules: 
+Modified example based on the follwoing blog , we use the yellow and green service to test our rules: 
 https://aws.amazon.com/blogs/containers/how-to-expose-multiple-applications-on-amazon-eks-using-a-single-application-load-balancer/
 
 ## 1. Application and Docker Image Creation Process
@@ -329,7 +329,6 @@ kubectl delete pod my-pod -n my-namespace
 If you’re running multiple ingress controllers, or running on a cloudprovider that natively handles ingress, you can specify the annotation kubernetes.io/ingress.class: "contour" on all ingresses that you would like Contour to claim. You can customize the class name with the --ingress-class-name flag at runtime. If the kubernetes.io/ingress.class annotation is present with a value other than "contour", Contour will ignore that ingress.
 
 
-## References
 
 ## References
 
