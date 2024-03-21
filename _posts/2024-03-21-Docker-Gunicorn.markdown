@@ -7,13 +7,13 @@ tags: [AWS,ECS]
 
 ### Issue/Problem 
 
-We are using the following base image and are seeing very high RAM and CPU usage (Causing task crashes).
+We are using the following base image for our ECS Containers and are seeing very high RAM and CPU usage (Causing task crashes).
 
 Image : tiangolo/uvicorn-gunicorn-fastapi:python3.11
 
 ### Soultion 
 
-We should not be using tiangolo/uvicorn-gunicorn-fastapi:python3.11 as the base image for our docker container. We need tou build our own image, See the following explanation. 
+We should not be using tiangolo/uvicorn-gunicorn-fastapi:python3.11 as the base image for our docker container. We need to build our own image, See the following explanation. 
 
 ***Reference taken from the from the fastapi.tiangolo.com offical site:*** 
 https://fastapi.tiangolo.com/deployment/docker/
@@ -26,16 +26,7 @@ So, in this case, you would not want to have a process manager like Gunicorn wit
 
 Having another process manager inside the container (as would be with Gunicorn or Uvicorn managing Uvicorn workers) would only add unnecessary complexity that you are most probably already taking care of with your cluster system.
 ```
-```
-Memory
-If you run a single process per container you will have a more or less well-defined, stable, and limited amount of memory consumed by each of those containers (more than one if they are replicated).
 
-And then you can set those same memory limits and requirements in your configurations for your container management system (for example in Kubernetes). That way it will be able to replicate the containers in the available machines taking into account the amount of memory needed by them, and the amount available in the machines in the cluster.
-
-If your application is simple, this will probably not be a problem, and you might not need to specify hard memory limits. But if you are using a lot of memory (for example with machine learning models), you should check how much memory you are consuming and adjust the number of containers that runs in each machine (and maybe add more machines to your cluster).
-
-If you run multiple processes per container (for example with the official Docker image) you will have to make sure that the number of processes started doesn't consume more memory than what is available.
-```
 ```
 When to Use
 You should probably not use this official base image (or any other similar one) if you are using Kubernetes (or others) and you are already setting replication at the cluster level, with multiple containers. In those cases, you are better off building an image from scratch as described above: Build a Docker Image for FastAPI.
