@@ -81,12 +81,12 @@ CloudWatch Metrics :
 Service Average CPU utilisation : 100%
 Service Mamimum CPU utilisation : 100%
 
-![Metrics](/assets/img/autoscalling/twotasks.jpg)
+![Metrics](/assets/img/autoscaling/onetasks.JPG)
 
 Scalling is triggered based on Average 
 
 Second task doing nothing ( the aggratated CPU Drops)
-![Metrics](/assets/img/autoscalling/onetask.jpg)
+![Metrics](/assets/img/autoscaling/twotasks.JPG)
 
 CloudWatch Metrics : (the average ia acumlitate accross all ataks so we have ahost and cold task )
 Service Average CPU utilisation : 50%
