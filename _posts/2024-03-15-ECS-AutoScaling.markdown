@@ -2,8 +2,15 @@
 layout: post
 title:  "AWS ECS AutoScaling and CPU Metrics"
 date:   2024-03-07 12:13:26 +0000
-tags: [K8S]
+tags: [AWS,ECS]
 ---
+
+
+## AutoScaloing 
+
+We will cover : 
+CPU 
+Memory
 
 ## Service CPU Scaling:
 Scaling based on service CPU utilizes CloudWatch alarms associated with the ECS service to trigger scaling actions. When the average CPU utilization of all tasks in the service exceeds a specified threshold, ECS can automatically scale the service.
@@ -50,11 +57,22 @@ aws ecs execute-command  \
     --command "/bin/bash" \
     --interactive
 
+
+
 Use Stress tools :
 
-apt-get update && apt-get install -y stress
+    apt-get update && apt-get install -y stress
+
+CPU:
 stress --cpu 8 --timeout 1200s & top
 
+Memory 
+stress --vm 2 --vm-bytes 250M --timeout 300s
+
+Both :
+stress --cpu 8 --timeout 600s & stress --vm 1 --vm-bytes 512M --timeout 600s top
+ 
+stress --cpu 1 --vm 1 --vm-bytes 1G --timeout 600s
 
 **Findings** 
 
@@ -78,6 +96,13 @@ Service Mamimum CPU utilisation : 100%
 
 The oldest task is killed first ( this is the actually a Hot task that is running the process)
 
+
+### Solutions
+
+Auto Scalling scaling in protection 
+https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UpdateTaskProtection.html
+
+Updating 
 
 Reference : https://aws.amazon.com/blogs/containers/new-using-amazon-ecs-exec-access-your-containers-fargate-ec2/
 
