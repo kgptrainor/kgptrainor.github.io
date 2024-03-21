@@ -6,13 +6,10 @@ tags: [AWS,ECS]
 ---
 
 
-## AutoScaloing 
+## AutoScaling 
 
-We will cover : 
-CPU 
-Memory
 
-## Service CPU Scaling:
+### Service CPU Scaling:
 Scaling based on service CPU utilizes CloudWatch alarms associated with the ECS service to trigger scaling actions. When the average CPU utilization of all tasks in the service exceeds a specified threshold, ECS can automatically scale the service.
 
 **Advantages:**
@@ -31,7 +28,7 @@ Each task has its own CPU alarm, and scaling decisions are made based on the CPU
 
 #### Scaling with Task CPU:
 
-Scaling Up:
+**Scaling Up:**
 
 Trigger: An individual task's CPU utilization breaches its upper threshold.
 Action: Add a new task to handle the increased workload.
@@ -46,7 +43,7 @@ Provides more fine-grained control over scaling decisions, as it considers the C
 **Disadvantage:** 
 Expensive to use Container metrics 
 
-## Testing
+### Testing
 Using Amazon ECS Exec to access your containers on AWS Fargate and Amazon EC2
 
 aws ecs execute-command  \
@@ -59,9 +56,9 @@ aws ecs execute-command  \
 
 
 
-Use Stress tools :
+**Use Stress tools:**
 
-    apt-get update && apt-get install -y stress
+apt-get update && apt-get install -y stress
 
 CPU:
 stress --cpu 8 --timeout 1200s & top
@@ -102,7 +99,7 @@ The oldest task is killed first ( this is the actually a Hot task that is runnin
 Auto Scalling scaling in protection 
 https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UpdateTaskProtection.html
 
-Updating 
+Recommend using a different approach for long running tasks instead if possible. 
 
 Reference : https://aws.amazon.com/blogs/containers/new-using-amazon-ecs-exec-access-your-containers-fargate-ec2/
 
