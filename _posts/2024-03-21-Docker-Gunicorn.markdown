@@ -77,9 +77,7 @@ CMD ["opentelemetry-instrument", "uvicorn", "app.main:app", "--host", "0.0.0.0",
 ```
 
 
-https://github.com/arup-group/hazard-svc-iris/blob/dev/Dockerfile
-
 Reference :
 
-https://fastapi.tiangolo.com/deployment/docker/
-https://fastapi.tiangolo.com/deployment/docker/#build-a-docker-image-for-fastapi
+[https://fastapi.tiangolo.com/deployment/docker/](https://fastapi.tiangolo.com/deployment/docker/)  
+[https://fastapi.tiangolo.com/deployment/docker/#build-a-docker-image-for-fastapi](https://fastapi.tiangolo.com/deployment/docker/#build-a-docker-image-for-fastapi)
