@@ -81,7 +81,7 @@ CloudWatch Metrics :
 Service Average CPU utilisation : 100%
 Service Mamimum CPU utilisation : 100%
 
-![Metrics](/assets/img/autoscaling/onetasks.JPG)
+![Metrics](/assets/img/autoscaling/onetask.JPG)
 
 Scalling is triggered based on Average 
 
