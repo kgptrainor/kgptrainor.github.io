@@ -46,6 +46,7 @@ Expensive to use Container metrics
 ### Testing
 Using Amazon ECS Exec to access your containers on AWS Fargate and Amazon EC2
 
+```
 aws ecs execute-command  \
     --region $AWS_REGION \
     --cluster ecs-exec-demo-cluster \
@@ -53,23 +54,29 @@ aws ecs execute-command  \
     --container nginx \
     --command "/bin/bash" \
     --interactive
-
+```
 
 
 **Use Stress tools:**
 
+Install Stress Tool
+```
 apt-get update && apt-get install -y stress
-
+```
 CPU:
+```
 stress --cpu 8 --timeout 1200s & top
-
+```
 Memory 
+```
 stress --vm 2 --vm-bytes 250M --timeout 300s
-
+```
 Both :
+```
 stress --cpu 8 --timeout 600s & stress --vm 1 --vm-bytes 512M --timeout 600s top
  
 stress --cpu 1 --vm 1 --vm-bytes 1G --timeout 600s
+```
 
 **Findings** 
 
