@@ -81,3 +81,8 @@ Reference :
 
 [https://fastapi.tiangolo.com/deployment/docker/](https://fastapi.tiangolo.com/deployment/docker/)  
 [https://fastapi.tiangolo.com/deployment/docker/#build-a-docker-image-for-fastapi](https://fastapi.tiangolo.com/deployment/docker/#build-a-docker-image-for-fastapi)
+
+
+
+## Running on fargate 
+AWS Fargate launches each of the containers that you want to run into it’s own isolated micro VM. And that micro VM is actually sized specifically for the needs of that container. So you see here, rather than having large EC2 instances that have a larger boundary and multiple applications within that boundary, each of these containers has it’s own micro VM that is sized perfectly for that container.

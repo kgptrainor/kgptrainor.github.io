@@ -48,14 +48,14 @@ Using Amazon ECS Exec to access your containers on AWS Fargate and Amazon EC2
 
 ```
 aws ecs execute-command  \
-    --region $AWS_REGION \
-    --cluster ecs-exec-demo-cluster \
-    --task ef6260ed8aab49cf926667ab0c52c313 \
-    --container nginx \
+    --region us-west-2 \
+    --cluster iris-dev-ecs \
+    --task 2f17773dd1ad4153ae2417ac3d45599e \
+    --container hapi-svc-dev \
     --command "/bin/bash" \
     --interactive
 ```
-
+aws ecs execute-command --region us-west-2 --cluster iris-dev-ecs --task 2f17773dd1ad4153ae2417ac3d45599e --container hapi-svc --command "/bin/bash" --interactive --profile iris-dev
 
 **Use Stress tools:**
 
