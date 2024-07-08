@@ -57,12 +57,12 @@ tags: [AWS]
 
 | Area                | Action Taken                                  | Automation Implemented                                      | Achieved |
 |---------------------|-----------------------------------------------|-------------------------------------------------------------|----------|
-| Idle Databases      | Identified and shut down idle DB instances    |  | ☑️       |
-| Underutilized EC2   | Right-sized instances based on utilization    |  | ☑️       |
-| Unused Volumes      | Identified and deleted unused EBS volumes     |  | ☑️       |
-| Unused Elastic IPs  | Released unused Elastic IPs                   |  | ☑️       |
+| Idle Databases      | Identified and shut down idle DB instances    |  |     |
+| Underutilized EC2   | Right-sized instances based on utilization    |  |     |
+| Unused Volumes      | Identified and deleted unused EBS volumes     |  |     |
+| Unused Elastic IPs  | Released unused Elastic IPs                   |  |     |
 | Over-provisioned RIs| Modified Reserved Instances                   | Regular review and adjustment of RI purchases                | ☑️       |
-| Idle Load Balancers | Identified and shut down idle load balancers  |  | ☑️       |
+| Idle Load Balancers | Identified and shut down idle load balancers  |  |        |
 | Snapshot Management | Deleted old snapshots                         | Automated snapshot lifecycle policies                        | ☑️       |
 | Cost Alerts         | Set up cost alerts for unexpected spikes      | AWS Budgets and Cost anommily  alarms                        | ☑️       |
 | Tagging Compliance  | Implemented tagging policies                  | | ☑️       |
